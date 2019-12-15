@@ -1,2 +1,3 @@
 .git
 vitasdk-nightly.*
+.gitlab-ci.yml
