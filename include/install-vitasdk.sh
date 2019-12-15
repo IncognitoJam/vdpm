@@ -4,8 +4,41 @@ get_download_link () {
   curl -sL https://github.com/vitasdk/vita-headers/raw/master/.travis.d/last_built_toolchain.py | python - $@
 }
 
+need_root_perm () {
+  curr=$1
+  while true; do
+    if [ -d "$curr" ]; then
+      DIR_INFO=($(stat -Lc "%a %U %G" $curr))
+      PERM="0${DIR_INFO[0]}"
+      OWNER=${DIR_INFO[1]}
+      GROUP=${DIR_INFO[2]}
+      if [[ $(($PERM & 0200)) != 0 && $USER == $OWNER ]]; then
+        return
+      elif [ $(($PERM & 0002)) != 0 ]; then
+        return
+      elif [[ $(($PERM & 0020)) != 0 ]]; then
+        groups=($(groups $USER))
+        for grp in "${groups[@]}"; do
+          if [[ $GROUP == $grp ]]; then
+            return
+          fi
+        done
+      fi
+      echo 1
+      return
+    fi
+    curr=$(dirname $curr)
+  done
+}
+
 install_vitasdk () {
   INSTALLDIR=$1
+
+  # TODO: actually check if sudo is required for install dir
+  SUDO=
+  if [ -x "$(command -v sudo)" ]; then
+    SUDO=sudo
+  fi
 
   case "$(uname -s)" in
      Darwin*)
@@ -20,13 +53,13 @@ install_vitasdk () {
 
      Linux*)
       if [ -n "${TRAVIS}" ]; then
-          sudo apt-get install libc6-i386 lib32stdc++6 lib32gcc1 patch
+          $SUDO apt-get install libc6-i386 lib32stdc++6 lib32gcc1 patch
       fi
       if [ -d "$INSTALLDIR" ]; then
-        sudo rm -rf $INSTALLDIR
+        $SUDO rm -rf $INSTALLDIR
       fi
-      sudo mkdir -p $INSTALLDIR
-      sudo chown $USER:$(id -gn $USER) $INSTALLDIR
+      $SUDO mkdir -p $INSTALLDIR
+      $SUDO chown $USER:$(id -gn $USER) $INSTALLDIR
       wget -O "vitasdk-nightly.tar.bz2" "$(get_download_link master linux)"
       tar xf "vitasdk-nightly.tar.bz2" -C $INSTALLDIR --strip-components=1
       rm -f "vitasdk-nightly.tar.bz2"
