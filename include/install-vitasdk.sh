@@ -46,7 +46,7 @@ install_vitasdk () {
         rm -rf "$INSTALLDIR"
       fi
       mkdir -p $INSTALLDIR
-      wget -O "vitasdk-nightly.tar.bz2" "$(get_download_link master osx)"
+      curl -o "vitasdk-nightly.tar.bz2" -L "$(get_download_link master osx)"
       tar xf "vitasdk-nightly.tar.bz2" -C $INSTALLDIR --strip-components=1
       rm -f "vitasdk-nightly.tar.bz2"
      ;;
@@ -60,7 +60,7 @@ install_vitasdk () {
       fi
       $SUDO mkdir -p $INSTALLDIR
       $SUDO chown $USER:$(id -gn $USER) $INSTALLDIR
-      wget -O "vitasdk-nightly.tar.bz2" "$(get_download_link master linux)"
+      curl -o "vitasdk-nightly.tar.bz2" -L "$(get_download_link master linux)"
       tar xf "vitasdk-nightly.tar.bz2" -C $INSTALLDIR --strip-components=1
       rm -f "vitasdk-nightly.tar.bz2"
      ;;
@@ -71,7 +71,7 @@ install_vitasdk () {
         rm -rf $INSTALLDIR
       fi
       mkdir -p $INSTALLDIR
-      wget -O "vitasdk-nightly.tar.bz2" "$(get_download_link master win)"
+      curl -o "vitasdk-nightly.tar.bz2" -L "$(get_download_link master win)"
       tar xf "vitasdk-nightly.tar.bz2" -C $INSTALLDIR --strip-components=1
       rm -f "vitasdk-nightly.tar.bz2"
      ;;
